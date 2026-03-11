@@ -586,12 +586,26 @@
     display: block; font-size: 10px; color: var(--mid); letter-spacing: 0.2em;
     font-family: 'Noto Sans JP', sans-serif; font-weight: 400; margin-top: 4px;
   }
-  .footer-links { display: flex; gap: 28px; }
+  .footer-links { display: flex; gap: 28px; align-items: flex-start; }
   .footer-links a {
     font-size: 11px; color: rgba(253,250,244,0.65);
     text-decoration: none; letter-spacing: 0.1em; transition: color 0.3s;
   }
   .footer-links a:hover { color: var(--gold); }
+  .footer-nav-group {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .footer-nav-group .footer-nav-label {
+    font-size: 11px; color: rgba(253,250,244,0.65);
+    letter-spacing: 0.1em;
+  }
+  .footer-nav-sub {
+    display: flex; flex-direction: column; gap: 6px; padding-left: 12px;
+  }
+  .footer-nav-sub a {
+    font-size: 10px; color: rgba(253,250,244,0.45) !important;
+  }
+  .footer-nav-sub a:hover { color: var(--gold) !important; }
 
   /* RESPONSIVE */
   @media (max-width: 768px) {
@@ -915,7 +929,13 @@
   <div class="footer-links">
     <a href="index.html">トップページ</a>
     <a href="helm-light.html">Light版</a>
-    <a href="#">料金プラン</a>
+    <div class="footer-nav-group">
+      <span class="footer-nav-label">料金プラン</span>
+      <div class="footer-nav-sub">
+        <a href="index.html#pricing">無料（Entry版）</a>
+        <a href="helm-light.html">Light版</a>
+      </div>
+    </div>
     <a href="#">プライバシーポリシー</a>
     <a href="#">お問い合わせ</a>
   </div>
