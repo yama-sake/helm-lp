@@ -460,6 +460,47 @@
     letter-spacing: 0.1em;
   }
 
+  /* ─── OUTPUT TABS ─── */
+  .output-tabs {
+    display: flex;
+    gap: 8px;
+    margin-top: 48px;
+    margin-bottom: 32px;
+  }
+
+  .output-tab {
+    background: transparent;
+    border: 1px solid rgba(197,165,90,0.3);
+    color: rgba(253,250,244,0.5);
+    padding: 10px 28px;
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+
+  .output-tab.active {
+    background: var(--gold);
+    color: var(--black);
+    border-color: var(--gold);
+    font-weight: 700;
+  }
+
+  .output-tab:hover:not(.active) {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .output-note {
+    margin-top: 32px;
+    font-size: 13px;
+    color: rgba(253,250,244,0.4);
+    letter-spacing: 0.05em;
+    text-align: center;
+    font-style: italic;
+  }
+
   /* ─── OUTPUT PREVIEW ─── */
   .output {
     padding: 120px 0;
@@ -998,16 +1039,25 @@
   <div class="section-inner">
     <div class="section-label">OUTPUT</div>
     <h2 class="section-title">届くもの、<br>2つ。</h2>
-    <div class="output-grid">
+
+    <!-- タブ -->
+    <div class="output-tabs">
+      <button class="output-tab active" onclick="switchTab('beauty')">美容室</button>
+      <button class="output-tab" onclick="switchTab('food')">飲食店</button>
+      <button class="output-tab" onclick="switchTab('seitai')">整体院</button>
+    </div>
+
+    <!-- 美容室 -->
+    <div class="output-grid tab-content" id="tab-beauty">
       <div class="output-card">
         <span class="output-tag">OUTPUT A</span>
         <h3>補助金申請書ドラフト</h3>
         <p>様式2「経営計画書兼補助事業計画書」の経営計画4項目を、ご回答をもとに文章化。そのまま商工会議所に持参できる品質を目指します。</p>
         <div class="output-sample">
           <strong>【1. 企業概要】</strong><br>
-          当社は1985年創業の金属精密加工業です。正社員8名、パート2名で構成され、自動車部品加工を主力として年商2億円の事業を営んでいます。特に5軸加工と難削材への対応を強みとし…<br><br>
+          当社は2015年創業の美容室です。正社員2名、パート1名で構成され、カット・カラーを主力として年商1,200万円の事業を営んでいます。特にダメージレスカラーと頭皮ケアへの対応を強みとし…<br><br>
           <strong>【3. 自社の強み】</strong><br>
-          他社が断る難易度の高い加工案件を受け入れる技術力と、代表自らが技術相談に対応することによる「話の早さ」が主な選定理由として顧客から評価されています…
+          他店が敬遠しがちなダメージヘアや敏感肌のお客様への対応力と、オーナー自らが施術する「丁寧さと安心感」が主な選定理由としてお客様から評価されています…
         </div>
       </div>
       <div class="output-card">
@@ -1016,14 +1066,74 @@
         <p>ご回答データをもとに、SWOT分析・3C分析・簡易アクション提案を実施。経営の現在地と、次の一手を可視化します。</p>
         <div class="output-sample">
           <strong>【SWOT分析 — 強み（S）】</strong><br>
-          ・5軸加工×難削材の希少な組み合わせ<br>
-          ・社長直接対応による高速な技術判断<br>
-          ・既存顧客との10年以上の信頼関係<br><br>
+          ・ダメージレスカラー×頭皮ケアの希少な組み合わせ<br>
+          ・オーナー直接施術による高いカウンセリング品質<br>
+          ・既存顧客との5年以上の信頼関係<br><br>
           <strong>【推奨アクション】</strong><br>
-          医療機器分野への試作加工参入を最優先ルートとして推奨。競合の少ない領域で先行者優位を確保する戦略が有効です。
+          シニア向けヘアケア特化メニューへの参入を最優先ルートとして推奨。競合の少ない領域で先行者優位を確保する戦略が有効です。
         </div>
       </div>
     </div>
+
+    <!-- 飲食店 -->
+    <div class="output-grid tab-content" id="tab-food" style="display:none;">
+      <div class="output-card">
+        <span class="output-tag">OUTPUT A</span>
+        <h3>補助金申請書ドラフト</h3>
+        <p>様式2「経営計画書兼補助事業計画書」の経営計画4項目を、ご回答をもとに文章化。そのまま商工会議所に持参できる品質を目指します。</p>
+        <div class="output-sample">
+          <strong>【1. 企業概要】</strong><br>
+          当社は2010年創業のラーメン店です。正社員2名、アルバイト4名で構成され、豚骨醤油ラーメンを主力として年商800万円の事業を営んでいます。特にスープの長時間仕込みと無添加へのこだわりを強みとし…<br><br>
+          <strong>【3. 自社の強み】</strong><br>
+          他店にはない丁寧な仕込みへのこだわりと、店主自らが毎朝対応することによる「味の安定感と常連との距離感」が主な選定理由として評価されています…
+        </div>
+      </div>
+      <div class="output-card">
+        <span class="output-tag">OUTPUT B</span>
+        <h3>HELM 経営診断レポート</h3>
+        <p>ご回答データをもとに、SWOT分析・3C分析・簡易アクション提案を実施。経営の現在地と、次の一手を可視化します。</p>
+        <div class="output-sample">
+          <strong>【SWOT分析 — 強み（S）】</strong><br>
+          ・無添加×長時間仕込みという希少な組み合わせ<br>
+          ・店主直接対応による高いリピート率<br>
+          ・地域10年以上の根強いファン層<br><br>
+          <strong>【推奨アクション】</strong><br>
+          ランチ限定の女性・シニア向けヘルシーメニュー展開を最優先ルートとして推奨。競合の少ない時間帯・客層で先行者優位を確保する戦略が有効です。
+        </div>
+      </div>
+    </div>
+
+    <!-- 整体院 -->
+    <div class="output-grid tab-content" id="tab-seitai" style="display:none;">
+      <div class="output-card">
+        <span class="output-tag">OUTPUT A</span>
+        <h3>補助金申請書ドラフト</h3>
+        <p>様式2「経営計画書兼補助事業計画書」の経営計画4項目を、ご回答をもとに文章化。そのまま商工会議所に持参できる品質を目指します。</p>
+        <div class="output-sample">
+          <strong>【1. 企業概要】</strong><br>
+          当社は2012年創業の整体院です。院長1名、スタッフ2名で構成され、腰痛・肩こり改善を主力として年商600万円の事業を営んでいます。特に骨盤矯正と姿勢改善への対応を強みとし…<br><br>
+          <strong>【3. 自社の強み】</strong><br>
+          他院が対応しにくい慢性的な痛みや産後の骨盤ケアへの専門性と、院長自らが丁寧にカウンセリングする「再発しない体づくり」への姿勢が主な選定理由として評価されています…
+        </div>
+      </div>
+      <div class="output-card">
+        <span class="output-tag">OUTPUT B</span>
+        <h3>HELM 経営診断レポート</h3>
+        <p>ご回答データをもとに、SWOT分析・3C分析・簡易アクション提案を実施。経営の現在地と、次の一手を可視化します。</p>
+        <div class="output-sample">
+          <strong>【SWOT分析 — 強み（S）】</strong><br>
+          ・骨盤矯正×産後ケアという希少な専門性<br>
+          ・院長直接施術による高いリピート率<br>
+          ・地域口コミによる根強いファン層<br><br>
+          <strong>【推奨アクション】</strong><br>
+          40〜50代女性向けの姿勢改善・体質改善コースの定期プラン化を最優先ルートとして推奨。継続収益モデルへの転換が有効です。
+        </div>
+      </div>
+    </div>
+
+    <!-- 案4：注記 -->
+    <p class="output-note">※ これはサンプルです。実際にはご回答内容をもとに、あなたの会社の情報で生成されます。</p>
+
   </div>
 </section>
 
@@ -1195,6 +1305,14 @@
 </footer>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Tab switching
+  function switchTab(industry) {
+    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.output-tab').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + industry).style.display = 'grid';
+    event.target.classList.add('active');
+  }
+
   // FAQ toggle
   document.querySelectorAll('.faq-q').forEach(q => {
     q.addEventListener('click', () => {
