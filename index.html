@@ -466,6 +466,15 @@
     gap: 8px;
     margin-top: 48px;
     margin-bottom: 32px;
+    align-items: center;
+  }
+
+  .output-tabs-label {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    margin-right: 8px;
+    font-weight: 400;
   }
 
   .output-tab {
@@ -1042,9 +1051,10 @@
 
     <!-- タブ -->
     <div class="output-tabs">
-      <button class="output-tab active" onclick="switchTab('beauty')">美容室</button>
-      <button class="output-tab" onclick="switchTab('food')">飲食店</button>
-      <button class="output-tab" onclick="switchTab('seitai')">整体院</button>
+      <span class="output-tabs-label">例</span>
+      <button class="output-tab active" onclick="switchTab('beauty', this)">美容室</button>
+      <button class="output-tab" onclick="switchTab('food', this)">飲食店</button>
+      <button class="output-tab" onclick="switchTab('seitai', this)">整体院</button>
     </div>
 
     <!-- 美容室 -->
@@ -1306,11 +1316,11 @@
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   // Tab switching
-  function switchTab(industry) {
+  function switchTab(industry, btn) {
     document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.output-tab').forEach(el => el.classList.remove('active'));
     document.getElementById('tab-' + industry).style.display = 'grid';
-    event.target.classList.add('active');
+    btn.classList.add('active');
   }
 
   // FAQ toggle
