@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HELM Light版 — 経営基盤5分析セット</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600;700&family=Shippori+Mincho:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C5A55A;
+    --gold-light: #D4BB7A;
+    --gold-pale: #F5EDD8;
+    --black: #0D0D0D;
+    --charcoal: #1A1A1A;
+    --dark: #141210;
+    --mid: #9C8060;
+    --white: #FDFAF4;
+    --entry: #4A7C6F;
+    --entry-light: #5A9C8A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--black);
+    color: var(--white);
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; width: 100%; z-index: 100;
+    padding: 18px 60px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(13,13,13,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(197,165,90,0.1);
+  }
+  .nav-logo {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 20px; font-weight: 700;
+    color: var(--gold); text-decoration: none; letter-spacing: 0.15em;
+  }
+  .nav-logo span {
+    font-size: 10px; display: block;
+    color: var(--mid); letter-spacing: 0.3em;
+    font-family: 'Noto Sans JP', sans-serif; font-weight: 300;
+  }
+  .nav-back {
+    font-size: 12px; color: rgba(253,250,244,0.4);
+    text-decoration: none; letter-spacing: 0.1em;
+    display: flex; align-items: center; gap: 8px;
+    transition: color 0.3s;
+  }
+  .nav-back:hover { color: var(--gold); }
+
+  /* HERO */
+  .hero {
+    min-height: 85vh;
+    display: flex; flex-direction: column; justify-content: center;
+    align-items: center; text-align: center;
+    padding: 140px 60px 80px;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 40%, rgba(197,165,90,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 20% 70%, rgba(197,165,90,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse 40% 30% at 80% 70%, rgba(197,165,90,0.04) 0%, transparent 50%),
+      linear-gradient(180deg, #0D0D0D 0%, #141210 100%);
+  }
+
+  /* 背景の大きな円 */
+  .hero-circle {
+    position: absolute;
+    width: 600px; height: 600px;
+    border: 1px solid rgba(197,165,90,0.06);
+    border-radius: 50%;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: rotate 30s linear infinite;
+  }
+  .hero-circle:nth-child(2) {
+    width: 400px; height: 400px;
+    border-color: rgba(197,165,90,0.08);
+    animation-duration: 20s; animation-direction: reverse;
+  }
+  @keyframes rotate { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+  .hero-content { position: relative; max-width: 720px; }
+
+  .breadcrumb {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; margin-bottom: 40px;
+    font-size: 11px; color: var(--mid); letter-spacing: 0.2em;
+  }
+  .breadcrumb .sep { color: rgba(197,165,90,0.3); }
+  .breadcrumb .current { color: var(--gold); }
+
+  .plan-badge {
+    display: inline-flex; align-items: center; gap: 12px;
+    border: 1px solid rgba(197,165,90,0.4);
+    padding: 8px 24px; margin-bottom: 32px;
+    font-size: 11px; letter-spacing: 0.3em; color: var(--gold);
+  }
+  .plan-badge-dot {
+    width: 8px; height: 8px; background: var(--gold); border-radius: 50%;
+  }
+
+  .hero h1 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: clamp(28px, 4vw, 52px);
+    font-weight: 700; line-height: 1.5;
+    color: var(--white); margin-bottom: 8px;
+  }
+  .hero h1 .gold { color: var(--gold); }
+
+  .hero-price-display {
+    margin: 28px 0;
+    display: flex; align-items: baseline;
+    justify-content: center; gap: 8px;
+  }
+  .price-num {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 64px; font-weight: 800; color: var(--gold); line-height: 1;
+  }
+  .price-unit { font-size: 16px; color: var(--mid); font-weight: 300; }
+
+  .hero-sub {
+    font-size: 14px; line-height: 1.9;
+    color: rgba(253,250,244,0.55); margin-bottom: 48px;
+    font-weight: 300;
+  }
+
+  .hero-cta-group {
+    display: flex; gap: 16px; justify-content: center; align-items: center;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: var(--gold); color: var(--black);
+    padding: 18px 52px; font-size: 15px; font-weight: 700;
+    letter-spacing: 0.1em; cursor: pointer; border: none;
+    transition: all 0.3s; font-family: 'Noto Sans JP', sans-serif;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover {
+    background: var(--gold-light); transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(197,165,90,0.3);
+  }
+  .btn-entry {
+    background: transparent;
+    border: 1px solid rgba(90,156,138,0.5);
+    color: var(--entry-light);
+    padding: 16px 36px; font-size: 13px; font-weight: 500;
+    letter-spacing: 0.08em; cursor: pointer;
+    transition: all 0.3s; font-family: 'Noto Sans JP', sans-serif;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-entry:hover {
+    background: rgba(90,156,138,0.1);
+    border-color: var(--entry-light);
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(197,165,90,0.25), transparent);
+  }
+
+  /* SECTION COMMON */
+  .section-inner { max-width: 1060px; margin: 0 auto; padding: 0 60px; }
+  .section-label {
+    font-size: 10px; letter-spacing: 0.45em; color: var(--gold);
+    font-weight: 300; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .section-label::before { content: ''; width: 32px; height: 1px; background: var(--gold); }
+  .section-title {
+    font-family: 'Shippori Mincho', serif;
+    font-size: clamp(22px, 3vw, 36px);
+    font-weight: 700; line-height: 1.5; margin-bottom: 16px;
+  }
+
+  /* COMPARISON */
+  .comparison { padding: 100px 0; background: var(--charcoal); }
+  .comparison-table {
+    width: 100%; border-collapse: separate;
+    border-spacing: 0; margin-top: 56px;
+    font-size: 13px;
+  }
+  .comparison-table thead tr th {
+    padding: 20px 24px; text-align: center;
+    font-weight: 500; letter-spacing: 0.1em;
+  }
+  .th-feature {
+    text-align: left !important;
+    color: rgba(253,250,244,0.35); font-size: 11px;
+    width: 40%;
+  }
+  .th-entry {
+    background: rgba(90,156,138,0.08);
+    border: 1px solid rgba(90,156,138,0.2);
+    border-bottom: none;
+    color: var(--entry-light); font-size: 14px;
+  }
+  .th-light {
+    background: rgba(197,165,90,0.1);
+    border: 2px solid rgba(197,165,90,0.4);
+    border-bottom: none;
+    color: var(--gold); font-size: 16px;
+  }
+  .th-light-badge {
+    display: block; font-size: 9px;
+    letter-spacing: 0.2em; color: var(--gold);
+    margin-bottom: 4px; opacity: 0.7;
+  }
+
+  .comparison-table tbody tr td {
+    padding: 14px 24px;
+    border-bottom: 1px solid rgba(197,165,90,0.06);
+    color: rgba(253,250,244,0.65); font-weight: 300;
+    vertical-align: middle;
+  }
+  .comparison-table tbody tr:hover td { background: rgba(197,165,90,0.03); }
+  .td-feature { color: rgba(253,250,244,0.75) !important; font-weight: 400 !important; }
+  .td-entry {
+    text-align: center;
+    background: rgba(90,156,138,0.04);
+    border-left: 1px solid rgba(90,156,138,0.15);
+    border-right: 1px solid rgba(90,156,138,0.15);
+  }
+  .td-light {
+    text-align: center;
+    background: rgba(197,165,90,0.04);
+    border-left: 2px solid rgba(197,165,90,0.25);
+    border-right: 2px solid rgba(197,165,90,0.25);
+  }
+  .check-gold { color: var(--gold); font-size: 16px; font-weight: 700; }
+  .check-green { color: var(--entry-light); font-size: 16px; font-weight: 700; }
+  .dash { color: rgba(253,250,244,0.15); font-size: 18px; }
+  .category-row td {
+    background: rgba(197,165,90,0.06) !important;
+    font-size: 10px !important;
+    letter-spacing: 0.25em !important;
+    color: var(--gold) !important;
+    font-weight: 500 !important;
+    padding: 10px 24px !important;
+    border-bottom: 1px solid rgba(197,165,90,0.1) !important;
+  }
+
+  .price-row td {
+    padding: 24px !important;
+    border-bottom: none !important;
+  }
+  .price-entry-cell {
+    text-align: center;
+    background: rgba(90,156,138,0.06) !important;
+    border: 1px solid rgba(90,156,138,0.2) !important;
+    border-top: none !important;
+  }
+  .price-light-cell {
+    text-align: center;
+    background: rgba(197,165,90,0.08) !important;
+    border: 2px solid rgba(197,165,90,0.4) !important;
+    border-top: none !important;
+  }
+  .price-free { color: var(--entry-light); font-family: 'Shippori Mincho', serif; font-size: 24px; font-weight: 700; }
+  .price-paid { color: var(--gold); font-family: 'Shippori Mincho', serif; font-size: 28px; font-weight: 800; }
+  .price-unit-small { font-size: 12px; color: var(--mid); font-weight: 300; margin-left: 4px; }
+
+  /* FOR WHO */
+  .forwho { padding: 100px 0; background: var(--black); }
+  .forwho-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 2px; margin-top: 56px;
+  }
+  .forwho-card {
+    background: rgba(197,165,90,0.03);
+    border: 1px solid rgba(197,165,90,0.1);
+    padding: 40px 32px;
+    transition: all 0.4s; position: relative; overflow: hidden;
+  }
+  .forwho-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 3px; height: 0;
+    background: var(--gold);
+    transition: height 0.4s;
+  }
+  .forwho-card:hover { background: rgba(197,165,90,0.07); border-color: rgba(197,165,90,0.25); }
+  .forwho-card:hover::before { height: 100%; }
+  .forwho-icon { font-size: 28px; margin-bottom: 16px; }
+  .forwho-card h3 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 17px; font-weight: 700;
+    color: var(--white); margin-bottom: 12px; line-height: 1.5;
+  }
+  .forwho-card p {
+    font-size: 13px; color: rgba(253,250,244,0.5);
+    line-height: 1.8; font-weight: 300;
+  }
+
+  /* SAMPLE REPORT */
+  .sample { padding: 100px 0; background: var(--charcoal); }
+  .sample-intro {
+    font-size: 15px; color: rgba(253,250,244,0.6);
+    line-height: 1.9; font-weight: 300; max-width: 600px;
+    margin-bottom: 56px;
+  }
+  .sample-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .sample-card {
+    background: var(--black);
+    border: 1px solid rgba(197,165,90,0.12);
+    overflow: hidden;
+  }
+  .sample-card-header {
+    background: rgba(197,165,90,0.08);
+    padding: 16px 24px;
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid rgba(197,165,90,0.12);
+  }
+  .sample-card-dot {
+    width: 8px; height: 8px;
+    background: var(--gold); border-radius: 50%;
+  }
+  .sample-card-title {
+    font-size: 11px; letter-spacing: 0.25em; color: var(--gold); font-weight: 500;
+  }
+  .sample-card-body { padding: 24px; }
+  .sample-text {
+    font-size: 12px; color: rgba(253,250,244,0.5);
+    line-height: 1.9; font-weight: 300;
+  }
+  .sample-text strong { color: var(--gold); font-weight: 500; }
+  .sample-text .highlight-box {
+    background: rgba(197,165,90,0.07);
+    border-left: 2px solid rgba(197,165,90,0.4);
+    padding: 10px 14px; margin-top: 12px;
+    font-size: 12px; color: rgba(253,250,244,0.65);
+    line-height: 1.7;
+  }
+  .sample-blur {
+    filter: blur(4px);
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.6;
+  }
+  .sample-lock {
+    text-align: center; padding: 20px 0 8px;
+    font-size: 11px; color: var(--gold);
+    letter-spacing: 0.2em;
+  }
+
+  /* FLOW */
+  .flow { padding: 100px 0; background: var(--black); }
+  .flow-steps {
+    display: flex; gap: 0;
+    margin-top: 56px;
+    position: relative;
+  }
+  .flow-steps::before {
+    content: '';
+    position: absolute;
+    top: 32px; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(197,165,90,0.3), rgba(197,165,90,0.3), transparent);
+  }
+  .flow-step {
+    flex: 1; text-align: center; padding: 0 20px;
+    position: relative;
+  }
+  .flow-num {
+    width: 64px; height: 64px;
+    border: 1px solid rgba(197,165,90,0.4);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    font-family: 'Shippori Mincho', serif;
+    font-size: 22px; font-weight: 700; color: var(--gold);
+    background: var(--black); position: relative; z-index: 1;
+  }
+  .flow-step h3 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 16px; font-weight: 700; color: var(--white);
+    margin-bottom: 10px; line-height: 1.5;
+  }
+  .flow-step p {
+    font-size: 12px; color: rgba(253,250,244,0.45);
+    line-height: 1.7; font-weight: 300;
+  }
+  .flow-arrow {
+    position: absolute; top: 24px; right: -12px;
+    color: rgba(197,165,90,0.4); font-size: 20px; z-index: 2;
+  }
+
+  /* GUARANTEE */
+  .guarantee { padding: 80px 0; background: var(--charcoal); }
+  .guarantee-box {
+    max-width: 700px; margin: 0 auto;
+    border: 1px solid rgba(197,165,90,0.25);
+    padding: 52px 60px; text-align: center; position: relative;
+  }
+  .guarantee-box::before {
+    content: '安心の';
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    background: var(--charcoal); padding: 0 16px;
+    font-size: 11px; color: var(--gold); letter-spacing: 0.3em;
+  }
+  .guarantee-icon { font-size: 40px; margin-bottom: 16px; }
+  .guarantee-box h3 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 22px; font-weight: 700; color: var(--white);
+    margin-bottom: 16px;
+  }
+  .guarantee-box p {
+    font-size: 13px; color: rgba(253,250,244,0.55);
+    line-height: 1.9; font-weight: 300;
+  }
+
+  /* CTA */
+  .cta-section {
+    padding: 120px 0;
+    background: linear-gradient(135deg, #141210 0%, #0D0D0D 50%, #141210 100%);
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .cta-section::before {
+    content: 'LIGHT';
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Shippori Mincho', serif;
+    font-size: 240px; font-weight: 800;
+    color: rgba(197,165,90,0.025);
+    letter-spacing: 0.1em; white-space: nowrap; pointer-events: none;
+  }
+  .cta-content { position: relative; }
+  .cta-section h2 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: clamp(24px, 3.5vw, 44px);
+    font-weight: 700; line-height: 1.6; color: var(--white); margin-bottom: 20px;
+  }
+  .cta-section h2 .gold { color: var(--gold); }
+  .cta-section p {
+    font-size: 14px; color: rgba(253,250,244,0.45);
+    margin-bottom: 48px; line-height: 1.8; font-weight: 300;
+  }
+  .cta-note {
+    font-size: 11px; color: rgba(253,250,244,0.25);
+    margin-top: 20px; letter-spacing: 0.1em;
+  }
+  .cta-or {
+    font-size: 12px; color: rgba(253,250,244,0.25);
+    margin: 0 8px; letter-spacing: 0.2em;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 48px 60px;
+    background: var(--charcoal);
+    border-top: 1px solid rgba(197,165,90,0.08);
+    display: flex; justify-content: space-between; align-items: center; gap: 40px;
+  }
+  .footer-logo {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 20px; font-weight: 700; color: var(--gold); letter-spacing: 0.15em;
+  }
+  .footer-logo span {
+    display: block; font-size: 10px; color: var(--mid);
+    letter-spacing: 0.2em; font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300; margin-top: 4px;
+  }
+  .footer-links {
+    display: flex; gap: 32px;
+  }
+  .footer-links a {
+    font-size: 12px; color: rgba(253,250,244,0.3);
+    text-decoration: none; letter-spacing: 0.1em;
+    transition: color 0.3s;
+  }
+  .footer-links a:hover { color: var(--gold); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    nav { padding: 14px 20px; }
+    .hero { padding: 100px 24px 60px; }
+    .section-inner { padding: 0 24px; }
+    .forwho-grid { grid-template-columns: 1fr; }
+    .sample-grid { grid-template-columns: 1fr; }
+    .flow-steps { flex-direction: column; gap: 32px; }
+    .flow-steps::before { display: none; }
+    .flow-arrow { display: none; }
+    footer { flex-direction: column; gap: 24px; }
+    .hero-cta-group { flex-direction: column; }
+    .guarantee-box { padding: 40px 24px; }
+    .footer-links { flex-wrap: wrap; gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    HELM
+    <span>経営者の10の必需品</span>
+  </a>
+  <a href="#" class="nav-back">← トップページに戻る</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-circle"></div>
+  <div class="hero-circle"></div>
+  <div class="hero-content">
+    <div class="breadcrumb">
+      <span>HELM</span>
+      <span class="sep">›</span>
+      <span>料金プラン</span>
+      <span class="sep">›</span>
+      <span class="current">Light版</span>
+    </div>
+    <div class="plan-badge">
+      <div class="plan-badge-dot"></div>
+      HELM LIGHT — 経営基盤5分析セット
+    </div>
+    <h1>
+      経営の「現在地」を、<br>
+      <span class="gold">5つの視点で立体的に見る。</span>
+    </h1>
+    <div class="hero-price-display">
+      <span class="price-num">9,800</span>
+      <span class="price-unit">円 / 月</span>
+    </div>
+    <p class="hero-sub">
+      Entry版で見えた「強みと弱み」の先へ。<br>
+      組織・商品・競合・顧客・戦略——5つの分析が、経営判断を変えます。
+    </p>
+    <div class="hero-cta-group">
+      <a href="#" class="btn-primary">Light版に申し込む →</a>
+      <a href="#" class="btn-entry">まずEntry版を無料で試す</a>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- COMPARISON -->
+<section class="comparison">
+  <div class="section-inner">
+    <div class="section-label">COMPARISON</div>
+    <h2 class="section-title">Entry版と<br>何が違うのか。</h2>
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th class="th-feature"></th>
+          <th class="th-entry">Entry<br><small style="font-size:11px;color:rgba(90,156,138,0.7);font-weight:300;">無料</small></th>
+          <th class="th-light"><span class="th-light-badge">おすすめ</span>Light<br><small style="font-size:11px;color:rgba(197,165,90,0.7);font-weight:300;">9,800円/月</small></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="category-row">
+          <td colspan="3">基本分析</td>
+        </tr>
+        <tr>
+          <td class="td-feature">補助金申請書ドラフト（経営計画4項目）</td>
+          <td class="td-entry"><span class="check-green">✓</span></td>
+          <td class="td-light"><span class="check-gold">✓</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">SWOT分析（強み・弱み・機会・脅威）</td>
+          <td class="td-entry"><span class="check-green">✓</span></td>
+          <td class="td-light"><span class="check-gold">✓</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">3C分析（自社・顧客・競合の関係図）</td>
+          <td class="td-entry"><span class="check-green">✓</span></td>
+          <td class="td-light"><span class="check-gold">✓</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">簡易アクション提案（1〜2案）</td>
+          <td class="td-entry"><span class="check-green">✓</span></td>
+          <td class="td-light"><span class="check-gold">✓</span></td>
+        </tr>
+        <tr class="category-row">
+          <td colspan="3">Light版 追加分析</td>
+        </tr>
+        <tr>
+          <td class="td-feature">McKinsey 7S 組織診断</td>
+          <td class="td-entry"><span class="dash">—</span></td>
+          <td class="td-light"><span class="check-gold">✓</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">BCGマトリクス（商品ポートフォリオ分析）</td>
+          <td class="td-entry"><span class="dash">—</span></td>
+          <td class="td-light"><span class="check-gold">✓</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">Five Forces（業界競争環境分析）</td>
+          <td class="td-entry"><span class="dash">—</span></td>
+          <td class="td-light"><span class="check-gold">✓</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">TOWS展開（戦略オプション一覧）</td>
+          <td class="td-entry"><span class="dash">—</span></td>
+          <td class="td-light"><span class="check-gold">✓</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">NPS推定（顧客ロイヤルティ診断）</td>
+          <td class="td-entry"><span class="dash">—</span></td>
+          <td class="td-light"><span class="check-gold">✓</span></td>
+        </tr>
+        <tr class="category-row">
+          <td colspan="3">サポート</td>
+        </tr>
+        <tr>
+          <td class="td-feature">アンケート質問数</td>
+          <td class="td-entry" style="color:rgba(253,250,244,0.55);font-size:13px;">12問</td>
+          <td class="td-light" style="color:var(--gold);font-size:13px;">20問</td>
+        </tr>
+        <tr>
+          <td class="td-feature">レポート納品日数</td>
+          <td class="td-entry" style="color:rgba(253,250,244,0.55);font-size:13px;">3営業日以内</td>
+          <td class="td-light" style="color:var(--gold);font-size:13px;">3営業日以内</td>
+        </tr>
+        <tr class="price-row">
+          <td class="td-feature"></td>
+          <td class="price-entry-cell">
+            <span class="price-free">無料</span>
+            <div style="margin-top:12px;">
+              <a href="#" style="display:inline-block;border:1px solid rgba(90,156,138,0.4);color:var(--entry-light);padding:10px 24px;font-size:12px;text-decoration:none;letter-spacing:0.1em;transition:all 0.3s;" onmouseover="this.style.background='rgba(90,156,138,0.1)'" onmouseout="this.style.background='transparent'">Entry版を試す</a>
+            </div>
+          </td>
+          <td class="price-light-cell">
+            <span class="price-paid">9,800</span><span class="price-unit-small">円/月</span>
+            <div style="margin-top:12px;">
+              <a href="#" style="display:inline-block;background:var(--gold);color:var(--black);padding:12px 28px;font-size:13px;font-weight:700;text-decoration:none;letter-spacing:0.1em;transition:all 0.3s;" onmouseover="this.style.background='#D4BB7A'" onmouseout="this.style.background='#C5A55A'">Light版に申し込む</a>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- FOR WHO -->
+<section class="forwho">
+  <div class="section-inner">
+    <div class="section-label">FOR WHO</div>
+    <h2 class="section-title">こんな方に<br>Light版が向いています。</h2>
+    <div class="forwho-grid">
+      <div class="forwho-card">
+        <div class="forwho-icon">📦</div>
+        <h3>商品・サービスの<br>整理をしたい方</h3>
+        <p>「何に力を入れるべきか迷っている」「売れ筋と利益の出る商品がバラバラ」——BCGマトリクスで、商品ポートフォリオを一枚の図に整理します。</p>
+      </div>
+      <div class="forwho-card">
+        <div class="forwho-icon">🏢</div>
+        <h3>組織の問題が<br>売上に影響していると感じる方</h3>
+        <p>「人材・仕組み・文化のどこかがズレている気がする」——McKinsey 7Sで、7つの要素のバランスを診断。経営者の頭の中を言語化します。</p>
+      </div>
+      <div class="forwho-card">
+        <div class="forwho-icon">🎯</div>
+        <h3>補助金申請後も<br>経営改善を続けたい方</h3>
+        <p>Entry版で申請書を提出した後、「次の一手」を考えたい方に。TOWS展開で、強みを活かした戦略オプションを複数提案します。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SAMPLE -->
+<section class="sample">
+  <div class="section-inner">
+    <div class="section-label">SAMPLE REPORT</div>
+    <h2 class="section-title">届くレポートの<br>中身を見る。</h2>
+    <p class="sample-intro">
+      Light版では、以下5つの分析レポートが届きます。<br>
+      一部をサンプルとして公開しています。
+    </p>
+    <div class="sample-grid">
+      <div class="sample-card">
+        <div class="sample-card-header">
+          <div class="sample-card-dot"></div>
+          <span class="sample-card-title">McKinsey 7S — 組織診断</span>
+        </div>
+        <div class="sample-card-body">
+          <div class="sample-text">
+            <strong>【Strategy（戦略）】</strong><br>
+            難削材×5軸加工という希少な組み合わせを武器に、価格競争の激しい汎用加工市場から距離を置く差別化戦略。ただし、その戦略を社内で言語化・共有する仕組みが存在していない。<br><br>
+            <strong>【Structure（組織構造）】</strong><br>
+            社長集中型のフラット構造。意思決定スピードは高いが、社長の稼働時間が経営ボトルネックになっている。
+            <div class="highlight-box">
+              ⚠️ 診断サマリー：7Sのうち「Systems（仕組み）」と「Staff（人材育成）」のスコアが低く、社長依存リスクが高い状態です。
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sample-card">
+        <div class="sample-card-header">
+          <div class="sample-card-dot"></div>
+          <span class="sample-card-title">BCGマトリクス — 商品ポートフォリオ</span>
+        </div>
+        <div class="sample-card-body">
+          <div class="sample-text">
+            <strong>【花形（Star）】</strong><br>
+            半導体部品加工（売上比率15%・成長率高）<br>
+            市場成長×自社シェア拡大の最優先投資領域。<br><br>
+            <strong>【金のなる木（Cash Cow）】</strong><br>
+            自動車部品加工（売上比率75%・成長率低）<br>
+            安定収益源だが、EVシフトによる10年後の縮小リスクあり。
+            <div class="highlight-box">
+              💡 推奨：自動車部品の利益を半導体・医療分野への先行投資に回す「収益転換」戦略を推奨します。
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sample-card">
+        <div class="sample-card-header">
+          <div class="sample-card-dot"></div>
+          <span class="sample-card-title">Five Forces — 競合環境分析</span>
+        </div>
+        <div class="sample-card-body">
+          <div class="sample-text sample-blur">
+            業界内競争：川口・大田区の汎用加工では中程度〜高い競争圧力。ただし5軸難削材に限定すると競合は3〜5社に減少し、競争圧力は低下する。新規参入の脅威：大手オンライン加工（ミスミ系）が小ロット市場に参入中。ただし対面での技術相談が必要な高難度案件には参入障壁が存在する。
+          </div>
+          <div class="sample-lock">🔒 Light版で全文を見る</div>
+        </div>
+      </div>
+      <div class="sample-card">
+        <div class="sample-card-header">
+          <div class="sample-card-dot"></div>
+          <span class="sample-card-title">TOWS展開 — 戦略オプション</span>
+        </div>
+        <div class="sample-card-body">
+          <div class="sample-text sample-blur">
+            SO戦略（強みで機会を掴む）：5軸×難削材の技術を活かし、成長中の医療機器試作市場に先行参入。Webサイトで加工事例を公開し、エンジニアからの直接引き合いを創出する。WO戦略（弱みを克服して機会を掴む）：社長の技術力をドキュメント化・動画化し、若手への技術移転を加速。
+          </div>
+          <div class="sample-lock">🔒 Light版で全文を見る</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLOW -->
+<section class="flow">
+  <div class="section-inner">
+    <div class="section-label">FLOW</div>
+    <h2 class="section-title">申し込みから<br>レポート受け取りまで。</h2>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <h3>Light版に<br>申し込む</h3>
+        <p>フォームからお申し込み。クレジットカードで月額9,800円をお支払いいただきます。</p>
+        <span class="flow-arrow">›</span>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <h3>20問の<br>アンケートに回答</h3>
+        <p>Entry版の12問＋追加8問。組織・顧客・本音まで、より深い情報をお聞きします。</p>
+        <span class="flow-arrow">›</span>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <h3>3営業日以内に<br>レポート納品</h3>
+        <p>5分析レポート＋補助金申請書ドラフトをPDFでお届けします。</p>
+        <span class="flow-arrow">›</span>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <h3>レポートを元に<br>経営判断へ</h3>
+        <p>商工会議所への申請書持参と、次の打ち手の検討を同時に進められます。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GUARANTEE -->
+<section class="guarantee">
+  <div class="section-inner">
+    <div class="guarantee-box">
+      <div class="guarantee-icon">🛡️</div>
+      <h3>まずEntry版を無料で試してから<br>決めていただいて構いません。</h3>
+      <p>
+        Entry版（無料）を先に体験し、レポートの質と使い勝手をご確認いただいた上で、<br>
+        Light版へのアップグレードをご検討ください。<br>
+        「無料でここまで出るなら、有料版はもっとすごい」——<br>
+        そう感じていただけると確信しています。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="section-inner">
+    <div class="cta-content">
+      <h2>
+        経営の「現在地」を知ることが、<br>
+        <span class="gold">次の一手への最短距離です。</span>
+      </h2>
+      <p>
+        9,800円で、5つの視点から経営を立体的に把握する。<br>
+        コンサルタントへの依頼と比べてみてください。
+      </p>
+      <div style="display:flex;gap:16px;justify-content:center;align-items:center;flex-wrap:wrap;">
+        <a href="#" class="btn-primary" style="font-size:16px;padding:20px 56px;">Light版に申し込む（9,800円/月）</a>
+        <span class="cta-or">or</span>
+        <a href="#" class="btn-entry">まずEntry版を無料で試す</a>
+      </div>
+      <p class="cta-note">初月のみご利用後、翌月以降は自動更新 ／ いつでもキャンセル可能</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-logo">
+      HELM
+      <span>Powered by Tokyo Total Consulting</span>
+    </div>
+  </div>
+  <div class="footer-links">
+    <a href="#">トップページ</a>
+    <a href="#">料金プラン</a>
+    <a href="#">プライバシーポリシー</a>
+    <a href="#">お問い合わせ</a>
+  </div>
+</footer>
+
+<script>
+  // Scroll fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.forwho-card, .sample-card, .flow-step, .comparison-table').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(24px)';
+    el.style.transition = `opacity 0.6s ${i * 0.08}s ease, transform 0.6s ${i * 0.08}s ease`;
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
